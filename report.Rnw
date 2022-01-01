@@ -1,0 +1,68 @@
+\documentclass[11pt,a4paper,twoside]{report}
+\input{header.sty}   % packages, layout and standard macros
+
+\begin{document}
+<<'main-setup',include=FALSE,purl=FALSE>>=  
+library(knitr)                   # used, included when compiling outside RStudio
+opts_chunk$set(                  # Overall Chapter options 
+    concordance=TRUE,            # provides a mapping between line numbers in the Rnw file and the generated TeX file. This enables both direct navigation to compilation errors within Rnw files and compatibility with Synctex for PDF previewing.
+    cache=TRUE                   # Caching results... may be overruled for individual chunks
+		)
+@
+
+\graphicspath{{./figure/}}            % where are the figures placed
+\DeclareGraphicsExtensions{.pdf,.png} % what figure extension do we consider
+\setcounter{tocdepth}{1}              % level of detail for the toc
+
+\thispagestyle{empty}                 % front page does not have a number
+\begin{center}
+  \vspace*{6cm}{\bfseries\Huge  % title follows
+  STA472 Report Power Curve Simulation\\[5mm]
+  }
+  \vfill
+
+  \LARGE         Anouk Petitpierre\\[12mm]  % Your name 
+  
+  \normalsize    Version \today            % Possibly change to fixed date
+\end{center}
+\cleardoublepage
+
+\thispagestyle{plain}\markboth{Contents}{Contents}
+\tableofcontents
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'child-chapter01', child='chapter01.Rnw'>>=
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'child-chapter02', child='chapter02.Rnw'>>=
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'child-chapter03', child='chapter03.Rnw'>>=
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<'child-chapter04', child='chapter04.Rnw'>>=
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+<<'child-chapterA1', child='chapterA1.Rnw'>>=
+@
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\phantomsection  % needed to create a link to here for hyperref
+\addtocontents{toc}{\protect \vspace*{10mm}}
+\renewcommand\bibname{References}              % Comment if you want `Bibliography' as title
+\addcontentsline{toc}{chapter}{\bfseries \bibname}
+
+\bibliographystyle{mywiley} 
+\bibliography{biblio}
+
+\cleardoublepage
+
+\end{document}
+
