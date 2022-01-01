@@ -12,33 +12,5 @@ opts_chunk$set(
 
 \chapter{Appendix}
 
-<<>>=
-set.seed(5885)
-
-R<-100
-n1<-22
-n2<-31
-df<-5
-beta<-0.1
-var<-1.44
-alpha<-0.05
-
-pvalues<-c()
-for(i in 1:R){
-  test<-rnorm(n1,0,var)
-  reference<-rt(n2,df,beta)
-
-  p1<-shapiro.test(test)$p.value
-  p2<-shapiro.test(reference)$p.value
-
-  if(p1 >= alpha & p2 >= alpha){
-  p<-t.test(test,reference,var.equal=FALSE,conf.level=1-alpha)$p.value
-  }
-  if(p1 < alpha | p2 < alpha){
-  p<-wilcox.test(test,reference,var.equal=FALSE,conf.level=1-alpha)$p.value
-  }
-  pvalues<-c(pvalues,p)
-}
-
-prop<-length(pvalues[pvalues<alpha])/length(pvalues)
-@
+- code
+- where the data can be found

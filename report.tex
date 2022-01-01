@@ -1,0 +1,196 @@
+\documentclass[11pt,a4paper,twoside]{report}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\input{header.sty}   % packages, layout and standard macros
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\graphicspath{{./figure/}}            % where are the figures placed
+\DeclareGraphicsExtensions{.pdf,.png} % what figure extension do we consider
+\setcounter{tocdepth}{1}              % level of detail for the toc
+
+\thispagestyle{empty}                 % front page does not have a number
+\begin{center}
+  \vspace*{6cm}{\bfseries\Huge  % title follows
+  STA426 treekoR project\\[5mm]
+  }
+  \vfill
+
+  \LARGE         Anouk Petitpierre and Tudor Jumuga\\[12mm]  % Your name 
+  
+  \normalsize    Version \today            % Possibly change to fixed date
+\end{center}
+\cleardoublepage
+
+\thispagestyle{plain}\markboth{Contents}{Contents}
+\tableofcontents
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LaTeX file for Chapter 01
+
+
+
+\chapter{Introduction}
+
+- what is high-dimensional cytometry data?
+data acquired by cytometry (measurement of cells and their properties) which has more features than samples (more cells than individuals)
+
+- how is it traditionally analysed?
+either using Manual Gating (cluster cells into discrete populations based on shared marker expression) or Hierarchical Clustering (stratify cell subsets without a predetermined hypothesis)
+
+- what are the problems of these analysis methods?
+Manual Gating: time-consuming and potentially biased, as it relies on expert opinion
+Hierarchical Clustering: dismisses cell hierarchy
+
+- how does treekoR solve these problems?
+uses automated hierarchical clustering algorithm to make it more time-efficient and neutral, calculates both %parent and %total to include cell hierarchy
+
+- what is the workflow of treekoR?
+(1) clustering
+(2) constructing hierarchy
+(3) computing proportions (parent and total)
+(4) Significance Testing
+(5) Visualisation
+
+- what is the goal of this project?
+reproduce an analysis on a raw high-dimensional cytometry dataset using the framework of treekoR, also specify which dataset and provide a description of the dataset
+compare how well treekoR is able to determine cellular relationship with disease using %parent, %total (hopach) and %total (average linkage). 
+Find an appropriate measure for the comparison that is not "balanced accuracy".
+Provide explanation of our choice here, as well.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LaTeX file for Chapter 02
+
+
+\chapter{Methods} 
+
+We're using R version blabliblu and Rstudio version bliblabla and BiocManager version 3.14 and we're using the packages treekoR, SingleCellExperiment etc.
+
+part I: reproduction of treekoR analysis on Age Chronic (?) data set
+- reading in, transforming fsc to sce
+- arcsinh transformation with cofactor 5 of count data
+- clustering of data using flowSom-based function cluster() from the CATALYST package
+- construct cell hierarchy, once using "hopach" and once using "average linkage" algorithm, with function given in treekoR package, provide short explanation of how these these two hierarchical clustering algorithms work
+- compute parent as well as total proportions for both hierarchical trees
+- significance testing for both proportions
+- visualisation for both hierarchies
+
+
+part II: Benchmarking
+- use provided datasets by the author(s) of treekoR
+- use their code (provide description of what the code does here)
+- on top of balanced accuracy, compute our chosen measure and explain how it is computed
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LaTeX file for Chapter 04
+
+
+\chapter{Results}\label{sec:results}
+
+part I: reproduction of treekoR analysis
+- provide hierarchical trees
+- provide treekoR heatmap plots in the end
+- report significant findings / observations
+
+part II: Benchmarking
+- provide Benchmarking plots, once using balanced accuracy as a measure of comparison, once using our "own"
+- report findings / observations
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LaTeX file for Chapter 05
+
+
+% 
+\chapter{Discussion}\label{sec:discussion}
+
+part I:
+- why does our analysis look different from theirs?
+- what has remained unclear?
+- what could be explored further?
+
+part II: 
+- why does our analysis look different than theirs?
+- are there differences when using other measure instead of balanced accuracy? why? what does that mean?
+- what remains unclear?
+- what could be explored further?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+% LaTeX file for Chapter 01
+
+
+
+\chapter{Appendix}
+
+- code
+- where the data can be found
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\phantomsection  % needed to create a link to here for hyperref
+\addtocontents{toc}{\protect \vspace*{10mm}}
+\renewcommand\bibname{References}              % Comment if you want `Bibliography' as title
+\addcontentsline{toc}{chapter}{\bfseries \bibname}
+
+\bibliographystyle{mywiley} 
+\bibliography{biblio}
+
+\cleardoublepage
+
+\end{document}
+

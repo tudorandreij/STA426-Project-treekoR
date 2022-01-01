@@ -12,3 +12,28 @@ opts_chunk$set(
 
 \chapter{Introduction}
 
+- what is high-dimensional cytometry data?
+data acquired by cytometry (measurement of cells and their properties) which has more features than samples (more cells than individuals)
+
+- how is it traditionally analysed?
+either using Manual Gating (cluster cells into discrete populations based on shared marker expression) or Hierarchical Clustering (stratify cell subsets without a predetermined hypothesis)
+
+- what are the problems of these analysis methods?
+Manual Gating: time-consuming and potentially biased, as it relies on expert opinion
+Hierarchical Clustering: dismisses cell hierarchy
+
+- how does treekoR solve these problems?
+uses automated hierarchical clustering algorithm to make it more time-efficient and neutral, calculates both %parent and %total to include cell hierarchy
+
+- what is the workflow of treekoR?
+(1) clustering
+(2) constructing hierarchy
+(3) computing proportions (parent and total)
+(4) Significance Testing
+(5) Visualisation
+
+- what is the goal of this project?
+reproduce an analysis on a raw high-dimensional cytometry dataset using the framework of treekoR, also specify which dataset and provide a description of the dataset
+compare how well treekoR is able to determine cellular relationship with disease using %parent, %total (hopach) and %total (average linkage). 
+Find an appropriate measure for the comparison that is not "balanced accuracy".
+Provide explanation of our choice here, as well.

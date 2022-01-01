@@ -10,14 +10,19 @@ opts_chunk$set(
 
 \chapter{Methods} 
 
-\subsection{Simulation setup} 
+We're using R version blabliblu and Rstudio version bliblabla and BiocManager version 3.14 and we're using the packages treekoR, SingleCellExperiment etc.
 
-To quantify the effect on the nominal level and the power of the test when first testing normality with a Shapiro-Wilks test followed by either a t-test or Wilcoxon rank test we carried out the following simulation.
+part I: reproduction of treekoR analysis on Age Chronic (?) data set
+- reading in, transforming fsc to sce
+- arcsinh transformation with cofactor 5 of count data
+- clustering of data using flowSom-based function cluster() from the CATALYST package
+- construct cell hierarchy, once using "hopach" and once using "average linkage" algorithm, with function given in treekoR package, provide short explanation of how these these two hierarchical clustering algorithms work
+- compute parent as well as total proportions for both hierarchical trees
+- significance testing for both proportions
+- visualisation for both hierarchies
 
-We considered a two-sample situation where we drew a sample of size 22 from a normal distribution and a sample of size 31 from a t-distribution with $5$ degrees of freedom.
 
-The theoretical variance of both samples is 1.44 and a difference of means equal to 0.1. 
-
-Based on both samples, we first conducted a Shapiro-Wilks test. In case of a rejection at level $\alpha=0.05$, we compared the sample means with a Wilcoxon rank test otherwise with a two-sample $t$-test for unequal variances (both at level $\alpha=0.05$). 
-For each difference of the means (this time only 0.1), we reported the number of rejections among the $R=100$ repetitions of the experiment. 
-
+part II: Benchmarking
+- use provided datasets by the author(s) of treekoR
+- use their code (provide description of what the code does here)
+- on top of balanced accuracy, compute our chosen measure and explain how it is computed

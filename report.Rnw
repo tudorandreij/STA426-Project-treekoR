@@ -17,11 +17,11 @@ opts_chunk$set(                  # Overall Chapter options
 \thispagestyle{empty}                 % front page does not have a number
 \begin{center}
   \vspace*{6cm}{\bfseries\Huge  % title follows
-  STA472 Report Power Curve Simulation\\[5mm]
+  STA426 treekoR project\\[5mm]
   }
   \vfill
 
-  \LARGE         Anouk Petitpierre\\[12mm]  % Your name 
+  \LARGE         Anouk Petitpierre and Tudor Jumuga\\[12mm]  % Your name 
   
   \normalsize    Version \today            % Possibly change to fixed date
 \end{center}

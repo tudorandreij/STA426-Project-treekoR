@@ -9,4 +9,15 @@ opts_chunk$set(
 @
 
 % 
-\chapter{Conclusions}\label{sec:conclusion}
+\chapter{Discussion}\label{sec:discussion}
+
+part I:
+- why does our analysis look different from theirs?
+- what has remained unclear?
+- what could be explored further?
+
+part II: 
+- why does our analysis look different than theirs?
+- are there differences when using other measure instead of balanced accuracy? why? what does that mean?
+- what remains unclear?
+- what could be explored further?
