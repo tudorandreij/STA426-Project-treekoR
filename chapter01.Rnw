@@ -12,28 +12,31 @@ opts_chunk$set(
 
 \chapter{Introduction}
 
-- what is high-dimensional cytometry data?
-data acquired by cytometry (measurement of cells and their properties) which has more features than samples (more cells than individuals)
+The development of high-throughput single-cell technologies provide bioinformaticians with a large amount of high-dimensional cytometry data. High-dimensional data are data with more features than samples. In the case of cytometry data, which are data from cells and their properties, this means that more cells are measured than patients, from which the cells were taken.
 
-- how is it traditionally analysed?
-either using Manual Gating (cluster cells into discrete populations based on shared marker expression) or Hierarchical Clustering (stratify cell subsets without a predetermined hypothesis)
+Usually, these data are analysed using either Manual Gating or Hierarchical Clustering. Manual Gating clusters cells into discrete populations based on shared marker expression, Hierarchical Clustering stratifies cell subsets without a predetermined hypothesis.
 
-- what are the problems of these analysis methods?
-Manual Gating: time-consuming and potentially biased, as it relies on expert opinion
-Hierarchical Clustering: dismisses cell hierarchy
+Both methods have their advantages, but unfortunately, they have their disadvantages, too: Manual Gating is time-consuming and potentially biased, as the markers chosen for the hierarchical clustering are based on expert opinion. Hierarchical clustering is more time-efficient, but it dismisses cell hierarchy. treekoR is a novel framework developed to solve these disadvantages. It uses an automated hierarchical clustering algorithm to make the analysis more time-efficient and neutral, while still taking into account cell hierarchy. The treekoR framework consists of five steps:
 
-- how does treekoR solve these problems?
-uses automated hierarchical clustering algorithm to make it more time-efficient and neutral, calculates both %parent and %total to include cell hierarchy
+1. Clustering
 
-- what is the workflow of treekoR?
-(1) clustering
-(2) constructing hierarchy
-(3) computing proportions (parent and total)
-(4) Significance Testing
-(5) Visualisation
+The data are clustered using an existing clustering algorithm. In the paper, flowSom was used. 
 
-- what is the goal of this project?
-reproduce an analysis on a raw high-dimensional cytometry dataset using the framework of treekoR, also specify which dataset and provide a description of the dataset
-compare how well treekoR is able to determine cellular relationship with disease using %parent, %total (hopach) and %total (average linkage). 
-Find an appropriate measure for the comparison that is not "balanced accuracy".
-Provide explanation of our choice here, as well.
+2. Hierarchy
+
+The clusters are put into a hierarchical tree. Different hierarchical clustering algorithms can be used within the treekoR package. The paper itself preferes hopach, as it allows for multiple children at each node.
+
+3. Proportions
+
+For each node in the hierarchical tree, the proportion of that node's expression and its parent node's expression ($\%$parent) as well as the proportion of that node's expression and all the nodes' expression ($\%$total) are calculated.
+
+4. Significance Testing
+
+For each node, a t-test is used to test for a significant difference between the proportions of the diseased and the healthy samples. This can be done for both the $\%$parent and the $\%$total.
+
+5. Visualisation
+
+treekoR plots a heatmap, which shows the statistical test result for each cluster and each marker. It also provides a scatterplot with the T-scores of the two proportions plotted against each other.
+
+In this project, we want to reproduce a treekoR analysis on the raw Age Chronic data from \citet{Shen:16}.
+Additionally, we want to use prepped datasets from the authors of treekoR to reproduce their Benchmarking of treekoR: They used twelve datasets from eleven papers and run treekoR on them, once computing $\%parent$, once computing $\%total$ and using "average linkage" as the hierarchical clustering algorithm, and once computing $\%$total and using "hopach" as the hierarchical clustering algorithm. For all three results, they computed the balanced accuracy and provided a boxplot of the balanced accuracy of all twelve datasets. Apart from reproducing this analysis, we will also use a different performance evaluation measure for our model, namely X. 

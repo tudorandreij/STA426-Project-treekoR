@@ -10,7 +10,12 @@ opts_chunk$set(
 
 \chapter{Methods} 
 
-We're using R version blabliblu and Rstudio version bliblabla and BiocManager version 3.14 and we're using the packages treekoR, SingleCellExperiment etc.
+For the whole analysis, we were using R version 4.1.2, Rstudio version 1.4.1103 and BiocManager version 3.14.
+
+\section{Reproduction of treekoR Analysis on Age Chronic Dataset}
+
+To use the treekoR package from BiocManager on data, the data must first be converted to a Single Cell Experiment object. According to the treekoR paper's specifications, the count data were transformed using an arcsinh transformation with cofactor 5. The data were then clustered using the FlowSOM-based function cluster() from the CATALYST package. 
+FlowSOM uses a self-organising map in order to analyse cytometry data. Its goal is to prevent the potential loss in subset detection that comes with the increasing number of markers measured in cytometry. To this end, it uses two-level clustering and star charts. %cite FlowSOM paper
 
 part I: reproduction of treekoR analysis on Age Chronic (?) data set
 - reading in, transforming fsc to sce

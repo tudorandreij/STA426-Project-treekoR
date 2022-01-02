@@ -83,15 +83,21 @@
 
 \chapter{Introduction}
 
-- what is high-dimensional cytometry data?
-data acquired by cytometry (measurement of cells and their properties) which has more features than samples (more cells than individuals)
+The development of high-throughput single-cell technologies provide bioinformaticians with a large amount of high-dimensional cytometry data. 
 
-- how is it traditionally analysed?
-either using Manual Gating (cluster cells into discrete populations based on shared marker expression) or Hierarchical Clustering (stratify cell subsets without a predetermined hypothesis)
+Usually, these data are analysed using either Manual Gating or Hierarchical Clustering. Manual Gating clusters cells into discrete populations based on shared marker expression, Hierarchical Clustering stratifies cell subsets without a predetermined hypothesis.
 
-- what are the problems of these analysis methods?
-Manual Gating: time-consuming and potentially biased, as it relies on expert opinion
-Hierarchical Clustering: dismisses cell hierarchy
+Both methods have their advantages, but unfortunately, they have their disadvantages, too: Manual Gating is time-consuming and potentially biased, as the markers chosen for the hierarchical clustering are based on expert opinion. Hierarchical clustering is more time-efficient, but it dismisses cell hierarchy. treekoR is a novel framework developed to solve these disadvantages. It uses an automated hierarchical clustering algorithm to make the analysis more time-efficient and neutral, while still taking into account cell hierarchy. The treekoR framework consists of five steps:
+
+\section{Clustering}
+
+\section{Hierarchy}
+
+\section{Proportions}
+
+\section{Significance Testing}
+
+\section{Visualisation}
 
 - how does treekoR solve these problems?
 uses automated hierarchical clustering algorithm to make it more time-efficient and neutral, calculates both %parent and %total to include cell hierarchy
