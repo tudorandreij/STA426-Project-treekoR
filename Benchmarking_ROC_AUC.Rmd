@@ -1,0 +1,467 @@
+---
+title: "Benchmarking ROC_AUC"
+author: "Anouk Petitpierre"
+date: "1/3/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read in the Data
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(gridExtra)
+  library(ggnewscale)
+  library(cowplot)
+})
+
+parClassificationFiles <- list.files("data/benchmarking_data/classification",
+                                     full.names = TRUE)
+
+load(file = parClassificationFiles[1])
+
+parent_classif_df_combined <- allPredictions_df 
+
+for (i in 2:length(parClassificationFiles)){
+  load(file = parClassificationFiles[i])
+  
+  parent_classif_df_combined <- parent_classif_df_combined %>%
+    bind_rows(allPredictions_df)
+}
+
+#easier naming
+ds<-parent_classif_df_combined
+
+#prepare AUC matrix
+AUC<-matrix(nrow=12,ncol=3)
+```
+
+
+Analysis for Age Chronic
+
+```{r}
+head(ds)
+unique(ds$dataset)
+
+age<-ds[ds$dataset==unique(ds$dataset)[1],]
+
+unique(age$task_id)
+
+par(mfrow=c(1,3))
+
+#%total hopach
+age_hpch<-age[age$task_id=="abs_prop_hopach",]
+
+truth_binary<-vector(length=nrow(age_hpch))
+for(i in 1:nrow(age_hpch)){
+  if(age_hpch$truth[i]=="old"){
+    truth_binary[i]<-1
+  }
+}
+
+response_binary<-vector(length=nrow(age_hpch))
+for(i in 1:nrow(age_hpch)){
+  if(age_hpch$response[i]=="old"){
+    response_binary[i]<-1
+  }
+}
+
+age_hpch<-data.frame(row_id=age_hpch$row_id,truth=truth_binary,response=response_binary,prob.neg=age_hpch$prob.neg,prob.pos=age_hpch$prob.pos)
+
+library(ROCR)
+
+pred<-prediction(predictions=age_hpch$prob.pos,labels=age_hpch$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Age Chronic %total hopach")
+
+library(biostatUZH)
+AUC[1,1]<-confIntAUC(age_hpch$prob.pos[age_hpch$truth==1],age_hpch$prob.pos[age_hpch$truth==0])$AUC[1]
+
+#%total average linkage
+age_link<-age[age$task_id=="abs_prop_hc_avg",]
+
+truth_binary<-vector(length=nrow(age_link))
+for(i in 1:nrow(age_link)){
+  if(age_link$truth[i]=="old"){
+    truth_binary[i]<-1
+  }
+}
+
+response_binary<-vector(length=nrow(age_link))
+  for(i in 1:nrow(age_link)){
+    if(age_link$response[i]=="old"){
+      response_binary[i]<-1
+    }
+  }
+
+age_link<-data.frame(row_id=age_link$row_id,truth=truth_binary,response=response_binary,prob.neg=age_link$prob.neg,prob.pos=age_link$prob.pos)
+
+pred<-prediction(predictions=age_link$prob.pos,labels=age_link$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Age Chronic %total average linkage")
+
+AUC[1,2]<-confIntAUC(age_link$prob.pos[age_link$truth==1],age_link$prob.pos[age_link$truth==0])$AUC[1]
+
+
+#%parent
+age_prnt<-age[age$task_id=="parent_prop_hc_avg"|age$task_id=="parent_prop_hopach",]
+
+truth_binary<-vector(length=nrow(age_prnt))
+for(i in 1:nrow(age_prnt)){
+  if(age_prnt$truth[i]=="old"){
+    truth_binary[i]<-1
+  }
+}
+
+response_binary<-vector(length=nrow(age_prnt))
+  for(i in 1:nrow(age_prnt)){
+    if(age_prnt$response[i]=="old"){
+      response_binary[i]<-1
+    }
+  }
+
+age_prnt<-data.frame(row_id=age_prnt$row_id,truth=truth_binary,response=response_binary,prob.pos=age_prnt$prob.pos,prob.neg=age_prnt$prob.neg)
+
+pred<-prediction(predictions=age_prnt$prob.pos,labels=age_prnt$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Age Chronic %parent")
+
+AUC[1,3]<-confIntAUC(age_prnt$prob.pos[age_prnt$truth==1],age_prnt$prob.pos[age_prnt$truth==0])$AUC[1]
+```
+
+
+Analysis for Anti-CTLA-4 and Anti-PD-1
+
+```{r}
+par(mfrow=c(1,3))
+
+antis<-ds[ds$dataset=="Anti-CTLA-4 and Anti-PD-1, Subrahmanyam 2018",]
+
+prep<-function(dataset,case){
+truth_binary<-vector(length=nrow(dataset))
+for(i in 1:nrow(dataset)){
+  if(dataset$truth[i]==case){
+    truth_binary[i]<-1
+  }
+}
+response_binary<-vector(length=nrow(dataset))
+for(i in 1:nrow(dataset)){
+  if(dataset$response[i]==case){
+    response_binary[i]<-1
+  }
+}
+return(data.frame(row_id=dataset$row_id,truth=truth_binary,response=response_binary,prob.pos=dataset$prob.pos,prob.neg=dataset$prob.neg,task_id=dataset$task_id))
+}
+
+antis<-prep(antis,"responder")
+
+#%total hopach
+antis_hpch<-antis[antis$task_id=="abs_prop_hopach",]
+
+pred<-prediction(predictions=antis_hpch$prob.pos,labels=antis_hpch$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Anti-CTLA-4 and Anti-PD-1 %total hopach")
+
+AUC[2,1]<-confIntAUC(antis_hpch$prob.pos[antis_hpch$truth==1],antis_hpch$prob.pos[antis_hpch$truth==0])$AUC[1]
+
+#%total average linkage
+tasks<-c("abs_prop_hopach","abs_prop_hc_avg","parent_prop_hc_avg","parent_prop_hopach")
+antis_link<-antis[antis$task_id==tasks[2],]
+
+pred<-prediction(predictions=antis_link$prob.pos,labels=antis_link$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Anti-CTLA-4 and Anti-PD-1 %total average linkage")
+
+AUC[2,2]<-confIntAUC(antis_link$prob.pos[antis_link$truth==1],antis_link$prob.pos[antis_link$truth==0])$AUC[1]
+
+#%parent
+antis_prnt<-antis[antis$task_id==tasks[3]|antis$task_id==tasks[4],]
+
+pred<-prediction(predictions=antis_prnt$prob.pos,labels=antis_prnt$truth)
+perf<-performance(pred,"tpr","fpr")
+plot(perf,colorize=T,main="Anti-CTLA-4 and Anti-PD-1 %parent")
+
+AUC[2,3]<-confIntAUC(antis_prnt$prob.pos[antis_prnt$truth==1],antis_prnt$prob.pos[antis_prnt$truth==0])$AUC[1]
+```
+
+
+Analysis of Anti-PD-1
+
+```{r}
+par(mfrow=c(1,3))
+
+antik<-ds[ds$dataset==unique(ds$dataset)[3],]
+antik<-prep(antik,"responder")
+
+analysis<-function(dataset,task1,task2){
+  df<-dataset[dataset$task_id==task1|dataset$task_id==task2,]
+  pred<-prediction(predictions=df$prob.pos,labels=df$truth)
+  perf<-performance(pred,"tpr","fpr")
+  return(list(df,perf))
+}
+
+#%total hopach
+antik_hpch<-analysis(antik,tasks[1],tasks[1])
+antik_hpch[[1]]
+plot(antik_hpch[[2]],colorize=T,main="Anti-PD-1 %total hopach")
+
+aucf<-function(dataset){
+  return(confIntAUC(dataset$prob.pos[dataset$truth==1],dataset$prob.pos[dataset$truth==0]))
+}
+
+AUC[3,1]<-aucf(antik_hpch[[1]])$AUC[1]
+
+#%total average linkage
+antik_link<-analysis(antik,tasks[2],tasks[2])
+plot(antik_link[[2]],colorize=T,main="Anti-PD-1 %total average linkage")
+AUC[3,2]<-aucf(antik_link[[1]])$AUC[1]
+
+#%parent
+antik_prnt<-analysis(antik,tasks[3],tasks[4])
+plot(antik_prnt[[2]],colorize=T,main="Anti-PD-1 %parent")
+AUC[3,3]<-aucf(antik_prnt[[1]])$AUC[1]
+```
+
+
+
+Analysis of BCR-XL-sim
+
+```{r}
+par(mfrow=c(1,3))
+
+bcr<-ds[ds$dataset==unique(ds$dataset)[4],]
+bcr<-prep(bcr,"spike")
+
+#%total hopach
+bcr_hpch<-analysis(bcr,tasks[1],tasks[1])
+plot(bcr_hpch[[2]],colorize=T,main="BCR-XL-sim %total hopach")
+AUC[4,1]<-aucf(bcr_hpch[[1]])$AUC[1]
+
+#%total average linkage
+bcr_link<-analysis(bcr,tasks[2],tasks[2])
+plot(bcr_link[[2]],colorize=T,main="BCR_XL-sim %total average linkage")
+AUC[4,2]<-aucf(bcr_link[[1]])$AUC[1]
+
+#%parent
+bcr_prnt<-analysis(bcr,tasks[3],tasks[4])
+plot(bcr_prnt[[2]],colorize=T,main="BCR_XL-sim %parent")
+AUC[4,3]<-aucf(bcr_prnt[[1]])$AUC[1]
+```
+
+
+
+Analysis of Breast cancer tumor (5)
+
+```{r}
+breast<-ds[ds$dataset==unique(ds$dataset)[5],]
+breast<-prep(breast,"tumor")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+breast_hpch<-analysis(breast,tasks[1],tasks[1])
+plot(breast_hpch[[2]],colorize=T,main="Breast cancer tumor %total hopach")
+AUC[5,1]<-aucf(breast_hpch[[1]])$AUC[1]
+
+#%total average linkage
+breast_link<-analysis(breast,tasks[2],tasks[2])
+plot(breast_link[[2]],colorize=T,main="Breast cancer tumor %total average linkage")
+AUC[5,2]<-aucf(breast_link[[1]])$AUC[1]
+
+#%parent
+breast_prnt<-analysis(breast,tasks[3],tasks[4])
+plot(breast_prnt[[2]],colorize=T,main="Breast cancer tumor %parent")
+AUC[5,3]<-aucf(breast_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of CMV
+
+```{r}
+cmv<-ds[ds$dataset==unique(ds$dataset)[6],]
+cmv<-prep(cmv,"positive")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+cmv_hpch<-analysis(cmv,tasks[1],tasks[1])
+plot(cmv_hpch[[2]],colorize=T,main="CMV %total hopach")
+AUC[6,1]<-aucf(cmv_hpch[[1]])$AUC[1]
+
+#%total average linkage
+cmv_link<-analysis(cmv,tasks[2],tasks[2])
+plot(cmv_link[[2]],colorize=T,main="CMV %total average linkage")
+AUC[6,2]<-aucf(cmv_link[[1]])$AUC[1]
+
+#%parent
+cmv_prnt<-analysis(cmv,tasks[3],tasks[4])
+plot(cmv_prnt[[2]],colorize=T,main="CMV %parent")
+AUC[6,3]<-aucf(cmv_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of COVID-19 whole blood CyTOF
+
+```{r}
+blood<-ds[ds$dataset==unique(ds$dataset)[10],]
+blood<-prep(blood,"COVID-19")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+blood_hpch<-analysis(blood,tasks[1],tasks[1])
+plot(blood_hpch[[2]],colorize=T,main="COVID-19 whole blood CyTOF %total hopach")
+AUC[7,1]<-aucf(blood_hpch[[1]])$AUC[1]
+
+#%total average linkage
+blood_link<-analysis(blood,tasks[2],tasks[2])
+plot(blood_link[[2]],colorize=T,main="COVID-19 whole blood CyTOF %total average linkage")
+AUC[7,2]<-aucf(blood_link[[1]])$AUC[1]
+
+#%parent
+blood_prnt<-analysis(blood,tasks[3],tasks[4])
+plot(blood_prnt[[2]],colorize=T,main="COVID-19 whole blood CyTOF %parent")
+AUC[7,3]<-aucf(blood_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of COVID-19 PBMCs
+
+```{r}
+baron<-ds[ds$dataset==unique(ds$dataset)[7],]
+baron<-prep(baron,"ICU")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+baron_hpch<-analysis(baron,tasks[1],tasks[1])
+plot(baron_hpch[[2]],colorize=T,main="COVID-19 PBMCs %total hopach")
+AUC[8,1]<-aucf(baron_hpch[[1]])$AUC[1]
+
+#%total average linkage
+baron_link<-analysis(baron,tasks[2],tasks[2])
+plot(baron_link[[2]],colorize=T,main="COVID-19 PBMCs %total average linkage")
+AUC[8,2]<-aucf(baron_link[[1]])$AUC[1]
+
+#%parent
+baron_prnt<-analysis(baron,tasks[3],tasks[4])
+plot(baron_prnt[[2]],colorize=T,main="COVID-19 PBMCs %parent")
+AUC[8,3]<-aucf(baron_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of COVID-19 PBMCs CD8+ non-naive T cells
+
+```{r}
+math<-ds[ds$dataset=="COVID-19 PBMC, Mathew 2020",]
+math<-prep(math,"RD")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+math_hpch<-analysis(math,tasks[1],tasks[1])
+plot(math_hpch[[2]],colorize=T,main="COVID-19 PBMCs CD8+ non-naive T cells %total hopach")
+AUC[9,1]<-aucf(math_hpch[[1]])$AUC[1]
+
+#%total average linkage
+math_link<-analysis(math,tasks[2],tasks[2])
+plot(math_link[[2]],colorize=T,main="COVID-19 PBMCs CD8+ non-naive T cells %total average linkage")
+AUC[9,2]<-aucf(math_link[[1]])$AUC[1]
+
+#%parent
+math_prnt<-analysis(math,tasks[3],tasks[4])
+plot(math_prnt[[2]],colorize=T,main="COVID-19 PBMCs CD8+ non-naive T cells %parent")
+AUC[9,3]<-aucf(math_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of COVID-19 T cells CD4
+
+```{r}
+covid4<-ds[ds$dataset=="COVID-19 T cells, De Biasi 2020"&ds$data_panel_name=="CD4",]
+covid4<-prep(covid4,"COV")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+covid4_hpch<-analysis(covid4,tasks[1],tasks[1])
+plot(covid4_hpch[[2]],colorize=T,main="COVID-19 T cells CD4 %total hopach")
+AUC[10,1]<-aucf(covid4_hpch[[1]])$AUC[1]
+
+#%total average linkage
+covid4_link<-analysis(covid4,tasks[2],tasks[2])
+plot(covid4_link[[2]],colorize=T,main="COVID-19 T cells CD4 %total average linkage")
+AUC[10,2]<-aucf(covid4_link[[1]])$AUC[1]
+
+#%parent
+covid4_prnt<-analysis(covid4,tasks[3],tasks[4])
+plot(covid4_prnt[[2]],colorize=T,main="COVID-19 T cells CD4 %parent")
+AUC[10,3]<-aucf(covid4_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of COVID-19 T cells CD8
+
+```{r}
+covid8<-ds[ds$dataset=="COVID-19 T cells, De Biasi 2020"&ds$data_panel_name=="CD8",]
+covid8<-prep(covid8,"COV")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+covid8_hpch<-analysis(covid8,tasks[1],tasks[1])
+plot(covid8_hpch[[2]],colorize=T,main="COVID-19 T cells CD8 %total hopach")
+AUC[11,1]<-aucf(covid8_hpch[[1]])$AUC[1]
+
+#%total average linkage
+covid8_link<-analysis(covid8,tasks[2],tasks[2])
+plot(covid8_link[[2]],colorize=T,main="COVID-19 T cells CD8 %total average linkage")
+AUC[11,2]<-aucf(covid8_link[[1]])$AUC[1]
+
+#%parent
+covid8_prnt<-analysis(covid8,tasks[3],tasks[4])
+plot(covid8_prnt[[2]],colorize=T,main="COVID-19 T cells CD8 %parent")
+AUC[11,3]<-aucf(covid8_prnt[[1]])$AUC[1]
+```
+
+
+Analysis of Melanoma
+
+```{r}
+mela<-ds[ds$dataset=="Melanoma, Sade-Feldman 2019",]
+mela<-prep(mela,"responder")
+
+par(mfrow=c(1,3))
+
+#%total hopach
+mela_hpch<-analysis(mela,tasks[1],tasks[1])
+plot(mela_hpch[[2]],colorize=T,main="Melanoma %total hopach")
+AUC[12,1]<-aucf(mela_hpch[[1]])$AUC[1]
+
+#%total average linkage
+mela_link<-analysis(mela,tasks[2],tasks[2])
+plot(mela_link[[2]],colorize=T,main="Melanoma %total average linkage")
+AUC[12,2]<-aucf(mela_link[[1]])$AUC[1]
+
+#%parent
+mela_prnt<-analysis(mela,tasks[3],tasks[4])
+plot(mela_prnt[[2]],colorize=T,main="Melanoma %parent")
+AUC[12,3]<-aucf(mela_prnt[[1]])$AUC[1]
+```
+
+
+AUC plots
+
+```{r}
+rownames(AUC)<-c("Age chronic","Anti-CTLA-4 and anti-PD-1","Anti-PD-1","BCR-XL-sim","Breast cancer tumor","CMV","COVID-19 whole blood CyTOF","COVID-19 PBMCs","COVID-19 PBMCs CD8+ non-naive T cells","COVID-19 T cells CD4","COVID-19 T cells CD8","Melanoma")
+
+plot(c(AUC),ylim=c(0,1),ylab="AUC",col=rep(c(1:3),3),pch=16)
+legend("bottomright",legend=c("%total hopach","%total av. linkage","%parent"),col=c(1:3),pch=16)
+```
+
