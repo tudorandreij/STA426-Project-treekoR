@@ -26,8 +26,20 @@ part I: reproduction of treekoR analysis on Age Chronic (?) data set
 - significance testing for both proportions
 - visualisation for both hierarchies
 
+First the fcs files were read in and transformed to an sce. After appending metadata regarding the age of the individuals ('Old' or 'Young' based on a cutoff of 40 (?) years) the sce was then arcsinh transformed with cofactor 5, clustered using the flowSom-based function cluster() built into the CATALYST package. Cell hierarchy was achieved by using treekoR with both the "HOPACH" and "average linkage" algorithms.
+
+"HOPACH" works by recursively partitioning a data set with the PAM algorithm, short for Partitioning Around Medioids, while ordering and possibly collapsing clusters at each level. "PAM" works by calculating the so called medioids through a dissimilarity matrix, where dissimilarities can be either Euclidean distance or based on correlation of the individual elements. The product is a hierarchically structured tree of nodes. %cite HOPACH paper
+
+"Average linkage" on the other hand works by calculating the average distance between each pair of observations between clusters. %cite maybe this: https://www.solver.com/xlminer/help/hierarchical-clustering-intro
+
 
 part II: Benchmarking
 - use provided datasets by the author(s) of treekoR
 - use their code (provide description of what the code does here)
 - on top of balanced accuracy, compute our chosen measure and explain how it is computed
+
+For the benchmarking step we used the datasets provided by the authors of treekoR and part of their R code (? which hehe).
+
+The authors computed prob.pos and prob.neg values for their benchmarking using machine learning tools from the package mlr3 to train and predict the binary clinical outcome using \%total based on either HOPACH or average linkage and \%parent. These values were used by the authors to compute the balanced accuracy, which is the average of specificity and sensitivity.
+
+We decided to use a slightly different approach to benchmarking, namely to use the provided measures for specificity and sensitivity for ROC and AOC values respectively.
